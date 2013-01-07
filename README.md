@@ -1,4 +1,5 @@
 sparseD
 =======
 
-some sparse linear algrebra in D 
+some sparse linear algebra snippets  in D :
+- csr : Compressed Sparse Row format matrix
