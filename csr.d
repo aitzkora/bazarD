@@ -45,7 +45,9 @@ unittest {
    auto x = [1., 1., 1.];
    auto y = x;
    a.matvec(x, y);
+   assert( y == [3., 3., 15.]);
 }
+
 int main()
 {
  return 0;
