@@ -1,6 +1,7 @@
 import std.algorithm;
 import std.range;
 import std.typecons;
+import std.stdio;
 
 struct coo_matrix(Index) {
    Index nrows;
@@ -16,7 +17,7 @@ struct coo_matrix(Index) {
 
    void add_entries(in Index[] rows, in Index[] cols, in double[] vals) {
       I = I ~ rows;
-      J = J ~ rows;
+      J = J ~ cols;
       V = V ~ vals;
    }
 
@@ -48,6 +49,7 @@ unittest {
 //                    array(iota(10UL)),
 //		    array(repeat(1.0)));
    zero.sumIndex();
+   assert( zero.nnz() == 1);
    assert(zero.I == [1]);
    assert(zero.J == [1]);
    assert(zero.V == [5]);

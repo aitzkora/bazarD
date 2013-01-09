@@ -30,10 +30,11 @@ struct csr_matrix(Index) {
    this(coo_matrix!Index coo) {
        nrows = coo.nrows;
        ncols = coo.ncols;
+       coo.sumIndex();
        auto nnz = coo.nnz();
-       rowptr = new Index[nrows];
-       data = new double[nnz+1];
-       colind = new Index[nnz+1]; 
+       rowptr = new Index[nrows+1];
+       data = new double[nnz];
+       colind = new Index[nnz]; 
 
        foreach (i ; coo.I) {
             rowptr[i]++;    
@@ -41,9 +42,12 @@ struct csr_matrix(Index) {
 
        auto cumsum = function(Index x) {static Index y=0; y=y+x; return y;};
        rowptr = array(map!cumsum(rowptr));
-       writeln(rowptr);
 
-       //FIXME : finish to implement the conversion
+       foreach(i ; 0..nrows) {
+          colind[rowptr[i] .. rowptr[i+1]] = coo.J[rowptr[i] .. rowptr[i+1]]; 
+       }
+      
+       data = coo.V;
 
    }
 
@@ -87,9 +91,16 @@ unittest {
 
 int main()
 {
- auto haha = coo_matrix!ulong(2,2);
- haha.add_entries([1,1],[1,2],[2.,3.]);
+ auto haha = coo_matrix!ulong(4,4);
+ haha.add_entries([0,0,0],[0,1,3],[-1,-1,-3]);
+ haha.add_entries([1,1],[0,1],[-2,5]);
+ haha.add_entries([2,2,2],[2,3,4],[4,6,4]);
+ haha.add_entries([3,3,3],[0,2,3],[4,2,7]);
+ haha.add_entries([4,4],[1,4],[8,-5]);
  auto hoho = csr_matrix!ulong(haha); 
+ writeln(hoho.rowptr);
+ writeln(hoho.colind);
+ writeln(hoho.data);
  return 0;
 }
 
