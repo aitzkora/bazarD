@@ -39,9 +39,8 @@ struct csr_matrix(Index) {
        foreach (i ; coo.I) {
             rowptr[i]++;    
        }
-
        auto cumsum = function(Index x) {static Index y=0; y=y+x; return y;};
-       rowptr = array(map!cumsum(rowptr));
+       rowptr = [Index.init] ~ array(map!cumsum(rowptr[0 .. ($-1)]));
 
        foreach(i ; 0..nrows) {
           colind[rowptr[i] .. rowptr[i+1]] = coo.J[rowptr[i] .. rowptr[i+1]]; 
@@ -70,10 +69,10 @@ struct csr_matrix(Index) {
 
 unittest {
    /* example taken from scipy.sparse
-   >>> rowptr = array([0,2,3,6])
-   >>> colind = array([0,2,2,0,1,2])
-   >>> val = array([1,2,3,4,5,6])
-   >>> 
+    rowptr = array([0,2,3,6])
+    colind = array([0,2,2,0,1,2])
+    val = array([1,2,3,4,5,6])
+    
    matrix([[1, 0, 2],
           [0, 0, 3],
           [4, 5, 6]])
@@ -87,20 +86,30 @@ unittest {
    auto y = x;
    a.matvec(x, y);
    assert( y == [3., 3., 15.]);
+
+   /* example taken from Intel format sparse storage 
+   **/
+ 
+   auto haha = coo_matrix!int(5,5);
+   
+   int[]    I = [0, 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4];
+   int[]    J = [0, 1, 3, 0, 1, 2, 3, 4, 0, 2, 3, 1, 4];
+   double[] V = [1,-1,-3,-2, 5, 4, 6, 4,-4, 2, 7, 8,-5];   
+   haha.add_entries(I,J,V);
+
+   auto hoho = csr_matrix!int(haha); 
+   
+   int[] row = [0, 3, 5, 8, 11, 13];
+   int[] col = [0, 1, 3, 0, 1, 2, 3, 4, 0, 2, 3, 1, 4];
+   double[] data = [1, -1, -3, -2, 5, 4, 6, 4, -4, 2, 7, 8, -5];
+
+   assert(hoho.rowptr == row);
+   assert(hoho.colind == col);
+   assert(hoho.data == data);
 }
 
 int main()
 {
- auto haha = coo_matrix!ulong(4,4);
- haha.add_entries([0,0,0],[0,1,3],[-1,-1,-3]);
- haha.add_entries([1,1],[0,1],[-2,5]);
- haha.add_entries([2,2,2],[2,3,4],[4,6,4]);
- haha.add_entries([3,3,3],[0,2,3],[4,2,7]);
- haha.add_entries([4,4],[1,4],[8,-5]);
- auto hoho = csr_matrix!ulong(haha); 
- writeln(hoho.rowptr);
- writeln(hoho.colind);
- writeln(hoho.data);
  return 0;
 }
 

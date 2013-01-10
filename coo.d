@@ -22,18 +22,27 @@ struct coo_matrix(Index) {
    }
 
    Index nnz() {  
-      return (V == null) ? 0 : count(uniq(sort(zip(I,J))));
+      return (V == null) ? Index.init : cast(Index)count(uniq(sort(zip(I,J))));
    }     
   
    void sumIndex() {
       alias Tuple!(Index,Index) pair;
       double[pair] assoc;
+      // insertion dans assoc
       foreach(z; zip(I,J,V)) {
             assoc[pair(z[0],z[1])] += z[2];
       }
-      I = array(map!"a[0]"(assoc.keys));
-      J = array(map!"a[1]"(assoc.keys));
-      V = array(assoc.values);
+      int i = 0;
+      I.length = assoc.keys.length;
+      J.length = assoc.keys.length;
+      V.length = assoc.keys.length;
+
+      foreach(z; sort(assoc.keys)) {
+          I[i] = z[0];
+	  J[i] = z[1];
+	  V[i] = assoc[z];
+	  i++;
+      }	 
    }
 
 
@@ -45,9 +54,6 @@ unittest {
    assert( zero.nnz() == 0);
    zero.add_entries([1, 1], [1,1], [2, 3]);
    assert( zero.nnz() == 1);
-//   zero.add_entries(array(iota(10UL)),
-//                    array(iota(10UL)),
-//		    array(repeat(1.0)));
    zero.sumIndex();
    assert( zero.nnz() == 1);
    assert(zero.I == [1]);
