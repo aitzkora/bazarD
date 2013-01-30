@@ -1,9 +1,11 @@
-sparseD
+bazarD
 =======
 
-some sparse linear algebra snippets in D 
+my snippets in D programming language
 
-Now, you have two very basic modules
-
+sparse
+-------
 - csr : Compressed Sparse Row format matrix
 - coo : Coordinate Sparse format matrix
+
+
