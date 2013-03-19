@@ -1,0 +1,105 @@
+\documentclass[11pt,a4wide]{article}
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\newcommand{\tiret}{\rule[0.6ex]{1.3ex}{0.22ex}}
+
+% !! pour le francais
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{listings}
+\usepackage{relsize}
+\usepackage{color}
+\usepackage{fancyvrb}
+\usepackage{punk}
+\usepackage{emerald}
+
+\newcommand{\fleche}{\alert{$\pmb{\longrightarrow}$}~~}
+\newcommand{\calM}{{\mathcal{M}}}
+
+
+%%%%% for smiley
+\def\mysmile#1{{\ooalign{\hfil\lower.06ex % a smiley face
+ \hbox{$\scriptscriptstyle#1$}\hfil\crcr
+ \hfil\lower.7ex\hbox{\"{}}\hfil\crcr
+ \mathhexbox20D}}}
+
+
+\newcommand{\bad}{\bf \textcolor{red}{\mysmile \frown}}
+\newcommand{\neutral}{\bf \textcolor{blue}{\mysmile \minus}}
+\newcommand{\good}{\bf \textcolor{green}{\mysmile \smile}}
+
+\newcommand{\calU}{{\mathcal{U}}}
+\newcommand{\Cau}{\mathcal{C}_{n+1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Sym}[1]{\mathcal{S}_{#1}(\R)}
+\newcommand{\tran}{^{\top}}
+\newcommand{\pssg}{\langle \langle}
+\newcommand{\pssd}{\rangle \rangle}
+\newcommand{\aronde}{\mathcal{A}}
+\newcommand{\Tr}{\mathtt{Tr}}
+\newcommand{\accol}[1]{{\left\{ \begin{array}{ll} #1 \end{array} \right.}}
+\newcommand{\prods}[2]{\langle #1,#2 \rangle}
+\newcommand{\Aa}{\mathcal{A}}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\matlab}{{\ECFTeenSpirit Malab}\ }
+\newcommand{\python}{{\bf Python}\ }
+\newcommand{\numpy}{{\bf Numpy}\ }
+\newcommand{\scipy}{{\bf Scipy}\ }
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{ %
+  language=python,                % the language of the code
+  framerule=0pt,
+  basicstyle=\relsize{-2}\ttfamily,  % the size of the fonts that are used for the code
+  %backgroundcolor=\color{black!10},  % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  %frame=single,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  keywordstyle=\color{blue},      % keyword style
+  commentstyle=\color{dkgreen},   % comment style
+  stringstyle=\color{mauve}  
+}
+
+\newcommand{\guill}[1]{``#1''} % attention deja dans mycv
+
+
+\title{Comment utiliser \python comme alternative à \matlab}
+\begin{document}
+\maketitle
+\section{Introduction}
+  Pour ce projet, nous allons principalement utiliser 2 modules (ou bibliothèques) d'extension de \python qui
+  permettent de faire du calcul numérique \numpy et \scipy.
+
+  \subsection{Quelques Recommendations}
+ 
+    \begin{itemize}
+
+      \item Eviter le plus possible les boucles $\Rightarrow$ penser vectoriel
+      \item Allouer les structures de données avant d'écrire dedans : \lstinline!a=np.zeros(1000);!
+      \item eventuellement désallouer la mémoire qui n'est plus utilisé (utiliser {\tt del}) ; de toute façon \python 
+      a un ramasse-miettes intégré.
+      \item Faire des imports avec des noms : \lstinline! import numpy as np!
+       
+    \end{itemize}
+
+  \subsection{Quelques differences avec \matlab}
+    \begin{itemize}
+      
+      \item Attention \python utilise des références : 
+      \begin{lstlisting} 
+      a = np.zeros(4); b=a; b[1] = 10; a[1]
+      \end{lstlisting}
+      renvoie 10 et non pas zéro!
+      \item Pour copier un objet, on utilise {\tt .copy()} : ainsi 
+      \begin{lstlisting} 
+      a = np.zeros(4); b=a.copy(); b[1] = 10; a[1]
+      \end{lstlisting}
+      renvoie 0.0 
+    \end{itemize}
+
+\end{document}
