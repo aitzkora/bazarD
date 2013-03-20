@@ -105,20 +105,31 @@
       \begin{lstlisting} 
        a=np.random.rand(10,3) % a est de dimension 10x3
        m=np.mean(a,0) % est de dimension 3
-
       \end{lstlisting}
 
   \subsection{Quelques recommendations de programmation}
  
     \begin{itemize}
 
-      \item Eviter le plus possible les boucles $\Rightarrow$ penser vectoriel
-      \item Allouer les structures de données avant d'écrire dedans : \lstinline!a=np.zeros(1000);!
-      \item eventuellement désallouer la mémoire qui n'est plus utilisé (utiliser {\tt del}) ; de toute façon \python 
-      a un ramasse-miettes intégré.
-      \item Faire des imports avec des noms : \lstinline! import numpy as np!
-      \item écrire des tests (doctests, nose)
-      \item ecrire de la doc (docstring)
+      \item eviter le plus possible les boucles $\Rightarrow$ penser vectoriel
+      \item allouer les structures de données avant d'écrire dedans : \lstinline!a=np.zeros(1000);!
+      \item éventuellement désallouer la mémoire qui n'est plus utilisée ({\tt del}) ; \python 
+      a un ramasse-miettes intégré, mais on peut l'aider({\good})
+      \item Faire des imports avec des noms : 
+      \begin{lstlisting}
+      import numpy as np
+      import scipy as sp
+      \end{lstlisting}
+      \item écrire des tests (doctests, unittest ou nose). Dans ce TP on utilisera les premiers. Exemple pour verifier le résultat d'une fonction
+      \begin{lstlisting}
+      """
+      >>> mafonction(5)
+      3
+      """
+      \end{lstlisting}
+      en supposant que {\tt mafonction(5)} renvoies normalement 3.
+
+      \item écrire de la doc (docstring) :  
 
     \end{itemize}
 
@@ -175,8 +186,23 @@ $$
       \begin{enumerate}
 
         \item Faire une fonction {\tt K1D} qui prend un entier $n$ en argument et construit la matrice $K(n)$, on pourra utiliser {\tt diag}
-	\item ajouter un doctest sur la trace ${\mathrm tr}(K(n))=2*n$ avec n=10
-	\item coder une fonction {\tt laplacien\_2D} qui construit ${\mathcal H}(n_x,n_y)$; penser à utiliser $kron$
+	\item ajouter les doctest suivants sur {\tt K1D}
+	\begin{lstlisting}
+>>> np.diag(K1D(4)).tolist()
+[2.0, 2.0, 2.0, 2.0]
+>>> np.diag(K1D(3),-1).tolist()
+[-1.0, -1.0]
+>>> np.diag(K1D(4),1).tolist()
+[-1.0, -1.0, -1.0]
+	\end{lstlisting}
+      et rajouter 
+    \begin{lstlisting}
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod() 
+    \end{lstlisting}
+    pour executer les doctests
+    \item coder une fonction {\tt laplacien\_2D} qui construit ${\mathcal H}(n_x,n_y)$; penser à utiliser {\tt kron}
                  
      \end{enumerate}
 
