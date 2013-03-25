@@ -1,4 +1,4 @@
-from numpy import diag, ones , eye, kron, arange, pi, sin, cos, dot, outer, r_, real, zeros, imag, linspace
+from numpy import diag, ones , eye, kron, arange, pi, sin, cos, dot, outer, r_, real, zeros, imag, linspace, sqrt
 from numpy.linalg import norm
 from scipy.fftpack import fft
 def K1D(n):
@@ -67,10 +67,10 @@ def K2D_sparse(x):
         applique le laplacien_2D a x 
      
         >>> u=linspace(0,1,5)
-        >>> X_in=u[None,:]*u[:,None]; 
+        >>> X_in=sqrt(u[None,:])*u[:,None]**3; 
         >>> X_in[0, :] = 0; X_in[-1, :] = 0; 
         >>> X_in[:, 0] = 0; X_in[:, -1] = 0;
-        >>> norm(K2D_sparse(X_in)[1:-1,1:-1].flatten()-dot(K2D(3),X_in[1:-1,1:-1].flatten()))<1e-27
+        >>> norm(K2D_sparse(X_in)[1:-1,1:-1].flatten()-dot(K2D(3),X_in[1:-1,1:-1].flatten()))<1e-10
         True
         
         """
