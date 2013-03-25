@@ -1,4 +1,4 @@
-\documentclass[11pt,a4wide]{article}
+\documentclass[11pt]{article}
 
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
@@ -6,7 +6,7 @@
 
 % !! pour le francais
 \usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
+\usepackage[francais]{babel}
 \usepackage{listings}
 \usepackage{relsize}
 \usepackage{color}
@@ -14,8 +14,6 @@
 \usepackage{punk}
 \usepackage{emerald}
 
-\newcommand{\fleche}{\alert{$\pmb{\longrightarrow}$}~~}
-\newcommand{\calM}{{\mathcal{M}}}
 
 
 %%%%% for smiley
@@ -23,7 +21,6 @@
  \hbox{$\scriptscriptstyle#1$}\hfil\crcr
  \hfil\lower.7ex\hbox{\"{}}\hfil\crcr
  \mathhexbox20D}}}
-
 
 \newcommand{\bad}{\bf \textcolor{red}{\mysmile \frown}}
 \newcommand{\neutral}{\bf \textcolor{blue}{\mysmile \minus}}
@@ -46,6 +43,7 @@
 \newcommand{\python}{{\bf Python}\ }
 \newcommand{\numpy}{{\bf Numpy}\ }
 \newcommand{\scipy}{{\bf Scipy}\ }
+
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
@@ -64,9 +62,6 @@
   commentstyle=\color{dkgreen},   % comment style
   stringstyle=\color{mauve}  
 }
-
-\newcommand{\guill}[1]{``#1''} % attention deja dans mycv
-
 
 \title{Comment utiliser \python comme alternative à \matlab}
 \begin{document}
@@ -99,12 +94,15 @@
       renvoie 0.0 
       
       \item \python autorise le {\em broadcast} des matrices de dimensions differentes lors d'opérations terme à terme : en clair,
-      si 2 matrices(ou tableaux ND) ont une (ou plusieurs) dimensions differentes et que ces dimensions sont égales à 1 dans
-      pour un des deux membres alors le tableau est duplique dans cette dimension pour la faire correspondre avec l'autre. 
+      si 2 matrices(ou tableaux ND) ont une (ou plusieurs) dimensions différentes et que ces dimensions sont égales à 1 dans
+      dans un des deux membres de l'opération alors cette matrice est dupliquée selon cette dimension pour la faire correspondre avec l'autre. 
       Exemple : 
       \begin{lstlisting} 
-       a=np.random.rand(10,3) % a est de dimension 10x3
-       m=np.mean(a,0) % est de dimension 3
+       a=np.random.rand(10,3) # a est de dimension 10x3
+       m=np.mean(a,0) # est de dimension 3
+       a_0 = a - m # OK, on peut verifier que np.linalg.norm(np.mean(a_0,0)) ~ 0
+       m = np.r_[m,1] # m est mainteant de taille 4
+       a_0 = a - m # operands could not be broadcast together with shapes (10,3) (4)!
       \end{lstlisting}
 
   \subsection{Quelques recommendations de programmation}
@@ -136,12 +134,12 @@
 \section{Mini-projet}
 
    Nous allons attaquer un probléme classique sous plusieurs angles : on va résoudre l'équation de la chaleur avec
-   un schéma aux differences finies. L'interêt n'est pas dans les mathématiques mis en \oe uvres mais plutôt
-   de manipuler des matrices avec \numpy et \scipy
+   un schéma aux différences finies. L'interêt n'est pas dans les mathématiques mises en \oe uvres mais plutôt
+   dans le fait de  manipuler des matrices avec \numpy et \scipy.
 
    \subsection{préambule mathématique}
     
-   le but est de résoudre l'équation suivante, 
+   Le but est de résoudre l'équation suivante, 
 $$
 \begin{cases} 
 \frac{\partial u}{\partial t} - c \Delta u = 0 \\
@@ -155,7 +153,7 @@ $$
 $$
 et le laplacien ($\Delta u$) est discrétisé en espace sous la forme suivante 
 $$
-u(x,y) \approx \frac{u(x-h_x, y) + u(x+ h_x, y) - 2 u(x,y)}{h_x^2} +  \frac{u(x, y-h_y) + u(x, y + h_y) - 2 u(x,y)}{h_y^2} 
+u(x,y) \approx \frac{u(x-h, y) + u(x+ h, y) - 2 u(x,y)}{h^2} +  \frac{u(x, y-h) + u(x, y + h) - 2 u(x,y)}{h^2} 
 $$
 On arrive donc au schéma suivant, 
 \begin{equation}\label{Chal}
@@ -176,9 +174,9 @@ K(n) = \begin{pmatrix}
        {\bf 0} & -1      & 2 \\
        \end{pmatrix}
 $$
-alors le laplacien 2D se construit sous la forme suivant
+alors le laplacien 2D se construit sous la forme suivante
 $$
-{\mathcal H}(n_x,n_y) = \frac{1}{h_x^2} K(n_x) \otimes I_{n_y} + \frac{1}{h_y^2} I_{n_x} \otimes  K_(n_y) 
+{\mathcal H}(n) = \frac{1}{h^2} \left( K(n) \otimes I_n + I_{n} \otimes  K(n) \right)
 $$
 
    \subsection{Questions}
@@ -202,8 +200,23 @@ if __name__ == "__main__":
     doctest.testmod() 
     \end{lstlisting}
     pour executer les doctests
-    \item coder une fonction {\tt laplacien\_2D} qui construit ${\mathcal H}(n_x,n_y)$; penser à utiliser {\tt kron}
-                 
+    
+    \item les fonctions {\tt v1D(n,k)} et {\tt val1D(n,k)} qui calculent respectivement
+    $$
+    v_{n,k} =  \sin \left( \frac{kl\pi}{n+1} \right) \forall k \in \{1,\cdots,n\} \mbox{ et }  \lamba^n_k =  2 - 2 \cos \left( \frac{k\pi}{n+1} 
+    $$
+    
+    \item verifier que {\tt dot(K1D(n), v1D(n,1) = val1D(n,1) * v1D(n,1)}  et 
+    rajouter ce {\em doctest} pour $n= 3$.
+    
+    \item coder une fonction {\tt K2D} qui construit ${\mathcal H}(n)$; penser à utiliser {\tt kron}
+    
+    \item implanter la généralisation du {\em doctest} précédent
+    $$
+    H(n) \times x_{11} = (n-1)**2 * 2 * (2 - 2 \cos \left( \frac{\pi}{n+1} \right) x_{11}
+    $$
+
+
      \end{enumerate}
 
 
