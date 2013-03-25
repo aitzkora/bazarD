@@ -1,5 +1,6 @@
-from numpy import diag, ones , eye, kron, arange, pi, sin, cos, dot
+from numpy import diag, ones , eye, kron, arange, pi, sin, cos, dot, outer, r_, real, zeros, imag, linspace
 from numpy.linalg import norm
+from scipy.fftpack import fft
 def K1D(n):
     """
     Compute the 1D laplacian matrix
@@ -26,33 +27,59 @@ def v1D(n, k = 1):
      return sin(arange(1, n + 1) * k * pi / (n + 1))
 
 def K2D(n):
-    """ computes the 2D laplacian on the [0,1]^2 square
+    """ computes the 2D laplacian on the interior of the [0,1]^2 square
+    if X is a (n+2) x (n+2), you could apply K2D
+    to the vector X[1:-1,1:-1].flatten()
 
-    >>v11=outer(v1D(3),v1D(3)).flatten(); norm(dot(K2D(3),v11)-2*val1D(3)*(2-1)**2*v11)<1e-10
+    >>> v11=outer(v1D(3),v1D(3)).flatten(); norm(dot(K2D(3),v11)-2*val1D(3)*(3+1)**2*v11)<1e-10
     True
     
     """
-    return  (n-1)**2 * (kron(K1D(n), eye(n)) + kron(eye(n), K1D(n)))
+    return  (n+1)**2 * (kron(K1D(n), eye(n)) + kron(eye(n), K1D(n)))
 
-#def compute_locale(self):
-#        """
-#        schema explicite 
-#    
-#        u[i,j]^{n+1}-u[i,j]^{n} = dt/(h_x*h_y) * (u[i-1,j] + u[  
-#        
-#        """
-#        diag_x = - 2.0 + self.hx*self.hx/(2.*self.dt)
-#        diag_y = - 2.0 + self.hy*self.hy/(2.*self.dt)
-#        w_x =  self.dt /(self.hx * self.hx)
-#        w_y =  self.dt /(self.hy * self.hy)
-#        u=self.u
-#        u_out[1:-1, 1:-1] = (u[0:-2, 1:-1] + 
-#                             u[2:  , 1:-1] + 
-#                             u[1:-1, 1:-1] * diag_x ) * w_x +\
-#                            (u[1:-1, 0:-2] + 
-#                             u[1:-1, 2:  ] + 
-#                             u[1:-1, 1:-1] * diag_y ) * w_y
-#
+
+def dst1D(x):
+    return real(-fft(r_[0,x,0,-x[::-1]])[1:x.shape[0]+1]/2.j)
+
+def dst1Dp(x):
+    return -imag(fft(r_[0,x,zeros(x.shape),0])[1:x.shape[0]+1])
+
+def dst2D(X):
+    Y=zeros(X.shape)
+    for i in range(X.shape[0]):
+        Y[i,:] = dst1D(X[i,:].T).T
+    for j in range(X.shape[1]):
+        Y[:,j] = dst1D(Y[:,j])
+    return Y    
+
+def fft2D(X):
+    Y=zeros(X.shape,dtype='complex')
+    for i in range(X.shape[0]):
+        Y[i,:] = fft(X[i,:].T).T
+    for j in range(X.shape[1]):
+        Y[:,j] = fft(Y[:,j])
+    return Y    
+
+
+def K2D_sparse(x):
+
+        """
+        applique le laplacien_2D a x 
+     
+        >>> u=linspace(0,1,5)
+        >>> X_in=u[None,:]*u[:,None]; 
+        >>> X_in[0, :] = 0; X_in[-1, :] = 0; 
+        >>> X_in[:, 0] = 0; X_in[:, -1] = 0;
+        >>> norm(K2D_sparse(X_in)[1:-1,1:-1].flatten()-dot(K2D(3),X_in[1:-1,1:-1].flatten()))<1e-27
+        True
+        
+        """
+        H = zeros(x.shape)
+        H[1:-1, 1:-1] = 2. * x[1:-1, 1:-1] - x[0:-2, 1:-1] - x[2:, 1:-1] + \
+                        2. * x[1:-1, 1:-1] - x[1:-1, 0:-2] - x[1:-1, 2:] 
+ 
+        return (x.shape[0]-1)**2*H
+
 
 
 
