@@ -112,11 +112,11 @@ def resample(w, x):
     return x[idx]
 
 t_final =  20
-N = 100
+N = 10000
 x, y  = gen_data(t_final)
 x_smc, w, ess, log_z  = smc(init, logl, evol, resample, t_final, y, N)
-x_pf_mean = sum(x_smc * w, 0)
-x_pf_sd = sqrt(sum( x_smc **2 * w, 0) - x_pf_mean**2)
-it=mgrid[0.:t_final]
-plot(it, x_pf_mean, '-', it, x_pf_mean - 1.96 * x_pf_sd, '-', 
-                         it, x_pf_mean + 1.96 * x_pf_sd, '-', it, x, '-')
+#x_pf_mean = sum(x_smc * w, 0)
+#x_pf_sd = sqrt(sum( x_smc **2 * w, 0) - x_pf_mean**2)
+#it=mgrid[0.:t_final]
+#plot(it, x_pf_mean, '-', it, x_pf_mean - 1.96 * x_pf_sd, '-', 
+#                         it, x_pf_mean + 1.96 * x_pf_sd, '-', it, x, '-')
