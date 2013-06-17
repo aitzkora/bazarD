@@ -30,10 +30,13 @@ double[] resample(in double []  w, double [] x) {
 }
 
 
-Tuple!(double[][], double[]) smc(alias init, alias  logl, alias evol,
-                                 alias resa)(int T, double[] y, int N) {
+Tuple!(double[][], double[], double[], double)
+smc(alias init, alias  logl, alias evol,
+    alias resa)(int T, double[] y, int N) {
 
   
+    auto sum = (double[] x) => reduce!"a + b"(0.,x);
+    
     auto x = new double[][](N, T);
     auto log_w = new double[][](N, T);
     auto w = new double[][](N, T);
@@ -41,9 +44,33 @@ Tuple!(double[][], double[]) smc(alias init, alias  logl, alias evol,
     
     x[][0] = init(N); 
     log_w[][0] = logl(y[0], x[][0]);
+    w[][0] = map!(exp)(log_w[][0]);
 
+    auto w_sum = sum(w[][0]);
+    w[][0]  /= w_sum;
+    log_w[][0] -= log(w_sum);
 
+    log_z = log_(w_sum);
+    ess[0] = 1. / sum(map!(x=>x*x)(w[][0]));
 
+    foreach(t ; 0 .. T) { 
+
+        x[][t - 1]     = resample(w[][t - 1], x[][t - 1]);
+        log_w[][t - 1] = -log(N);
+        w[][t - 1]     = 1. / N;
+
+        x[][t] = evol(x[][t - 1]);
+        w[][t] = map!(exp)(log_w[][t]);
+
+        w_sum = sum(w[][t]);
+        w[][t] /= w_sum;
+        log_w -= log(w_sum);
+
+        log_z += log(w_sum);
+        ess[t] = 1./ sum(map!(x=>x*x)(w[][t]));
+    }
+
+    return Tuple!(double[][], double[], double[], double)(x, w, ess, logz);
 
 }                               
  
