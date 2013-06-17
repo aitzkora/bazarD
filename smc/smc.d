@@ -2,6 +2,7 @@ import std.stdio;
 import std.random;
 import std.range;
 import std.algorithm;
+import std.typecons;
 
 T[] cumsum(T)(T[] x) {
     auto y = x.dup;
@@ -71,6 +72,37 @@ smc(alias init, alias  logl, alias evol,
     }
 
     return Tuple!(double[][], double[], double[], double)(x, w, ess, logz);
-
 }                               
+double sigma_u = 1.0;
+auto measure = (double x) => x + sigma_u * uniform(0.0, 0.1);
+
+double normal(uint N) {
+    double x,y, w;
+    do { 
+        x = 2 * random(0.0, 1.0) - 1;
+        y = 2 * random(0.0, 1.0) - 1;
+        w = x * x + y * y;
+    } while (w >= 1);
+    w = sqrt((-2.0 * log(w))/w);
+    return w;
+}
+
+
+auto mu_1 =1.0;
+auto sigma_1 = 1.0;
+auto init = (uint N) => mu_1 + sigma_1 * normal(N)[];
+
+alias Tuple!(double[], double[]) pair_vector;
+
+pair_vector gen_data(uint T) {
+    auto x = new double[T];
+    auto y = new double[T];
+    x[0] = init(1);
+    y[1] = measure(x[1]);
+    foreach( t; 1 .. T) {
+        x[t] = evol(x[t - 1]);
+    }   y[t] = measure(x[t -1]);
+    return pair_vector(x,y);
+}
+
  
