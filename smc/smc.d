@@ -51,6 +51,7 @@ smc(alias init, alias  logl, alias evol,
     log_w[][0] -= log(w_sum);
 
     log_z = log_(w_sum);
+<<<<<<< HEAD
     ess[0] = 1. / sum(map!(x=>x*x)(w[][0]));
 
     foreach(t ; 0 .. T) { 
@@ -67,6 +68,7 @@ smc(alias init, alias  logl, alias evol,
         log_w -= log(w_sum);
 
         log_z += log(w_sum);
+<<<<<<< HEAD
         ess[t] = 1./ sum(map!(x=>x*x)(w[][t]));
     }
 
