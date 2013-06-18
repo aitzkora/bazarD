@@ -42,7 +42,7 @@ smc(alias init, alias logl, alias evol, alias resa)
     auto x = new double[][](T, N);
     auto log_w = new double[][](T, N);
     auto w = new double[][](T, N);
-    auto ess = new double[][](T, N);
+    auto ess = new double[T];
     
     x[0][] = init(N); 
     log_w[0][] = logl(y[0],x[0][]);
@@ -66,17 +66,17 @@ smc(alias init, alias logl, alias evol, alias resa)
         
         // weights computation
         log_w[t][] = log_w[t - 1][] + map!"logl(y[t],a)"(x[t][]);
-        w[t][] = map!(exp)(log_w[t][]);
+        w[t][] = map!(exp)(log_w[t][]).array();
 
         w_sum = sum(w[t][]);
         w[t][] /= w_sum;
-        log_w -= log(w_sum);
+        log_w[t][] -= log(w_sum);
 
         log_z += log(w_sum);
-        ess[t] = 1./ sum(map!(x=>x*x)(w[t][]));
+        ess[t] = 1./ sum(map!(x=>x*x)(w[t][]).array());
     }
 
-    return Tuple!(double[][], double[], double[], double)(x, w, ess, logz);
+    return Tuple!(double[][], double[], double[], double)(x, w, ess, log_z);
 }                               
 
 
@@ -99,7 +99,7 @@ pair_vector gen_data(alias init, alias measure, alias evol)(uint T) {
     x[0] = init(1)[0];
     y[1] = measure(x[1]);
     foreach( t; 1 .. T) {
-        x[t] = evol(x[t - 1]);
+        x[t] = evol(x[t - 1][]);
         y[t] = measure(x[t -1]);
     }   
     return pair_vector(x,y);
@@ -115,9 +115,10 @@ int main() {
    auto sigma_v = 1.0;
    auto pi = 3.1415926535897; 
    auto init = (uint N) => map!(x=> mu_1 + sigma_1 * normal())(iota(0,N)).array();
-   auto evol = (double x) => x + sigma_u * normal();
-   auto measure = (double x) => x + sigma_v * normal();
-   auto logl = (double x, double[] y) => map!(a=>-0.5 * log(2 * pi) - log(sigma_v) - 0.5 * ((a - x)/sigma_v)^^2)(y).array();
+   auto evol = (double[] x) { return map!(a=> a + sigma_u * normal())(x).array(); };
+   auto measure = (double x) { return x + sigma_v * normal(); };
+   auto logl = (double x, double[] y) 
+     { return map!(a=>-0.5 * log(2 * pi) - log(sigma_v) - 0.5 * ((a - x)/sigma_v)^^2)(y).array(); };
    
    auto z = gen_data!(init, measure, evol)(t_final);
    auto res = smc!(init, logl, evol, resample)(t_final, z[1], N);

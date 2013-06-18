@@ -85,7 +85,6 @@ function resample2(w::Array{Float64,1},x::Array{Float64,1})
 end    
 
 
-
 t_final =  20
 N = 10000
 x, y  = gen_data(t_final)

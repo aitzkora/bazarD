@@ -1,4 +1,4 @@
-from numpy import zeros, exp, log, sum, pi, cumsum, sqrt, 
+from numpy import zeros, exp, log, sum, pi, cumsum 
 
 
 def smc(init, logl, evol, resa, T, y, N):
@@ -63,7 +63,7 @@ def smc(init, logl, evol, resa, T, y, N):
         # normalization
         w_sum = sum(w[:, t])
         w[:, t] /= w_sum
-        log_w -= log(w_sum)
+        log_w[:, t] -= log(w_sum)
 
         #marginal log likelihood
         log_z += log(w_sum)
