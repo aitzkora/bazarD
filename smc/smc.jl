@@ -18,7 +18,7 @@ function smc(init, logl, evol, resa, T, y, N)
     ess[1] = 1. / sum(w[:, 1].^2)  
 
     for t = 2:T
-        x[:, t - 1] = resample(w[:, t - 1], x[:, t - 1])
+        x[:, t - 1] = resa(w[:, t - 1], x[:, t - 1])
         log_w[:, t-1] = -log(N)
         w[:, t - 1] = 1./ N
 
@@ -87,6 +87,7 @@ end
 
 
 t_final =  20
-N = 1000
+N = 10000
 x, y  = gen_data(t_final)
-x_smc, w, ess, log_z  = smc(init, logl, evol, resample2, t_final, y, N)
+@time x_smc, w, ess, log_z  = smc(init, logl, evol, resample2, t_final, y, N);
+#@time x_smc, w, ess, log_z  = smc(init, logl, evol, resample, t_final, y, N);

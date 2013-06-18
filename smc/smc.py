@@ -1,5 +1,5 @@
-from numpy import zeros, exp, log, sum, pi, cumsum, sqrt, mgrid
-from pylab import *
+from numpy import zeros, exp, log, sum, pi, cumsum, sqrt, 
+
 
 def smc(init, logl, evol, resa, T, y, N):
     """
@@ -114,7 +114,11 @@ def resample(w, x):
 t_final =  20
 N = 10000
 x, y  = gen_data(t_final)
+import time
+tic = time.time()
 x_smc, w, ess, log_z  = smc(init, logl, evol, resample, t_final, y, N)
+toc = time.time() -tic
+print ("tps smc = %fs" % toc)
 #x_pf_mean = sum(x_smc * w, 0)
 #x_pf_sd = sqrt(sum( x_smc **2 * w, 0) - x_pf_mean**2)
 #it=mgrid[0.:t_final]
