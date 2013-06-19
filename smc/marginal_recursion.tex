@@ -1,0 +1,88 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\begin{document}
+
+\begin{center} 
+show cleanly a recurrence formula on {\em posterior distribution}
+\end{center}
+
+From \cite{Freitas}, they say that we can obtain {\em straightforwardly}
+the following formula
+
+\begin{equation}\label{recurr}
+p(x_{0:t+1}|y_{1:t+1}) = p(x_{0:t}|y_{1:t}) \frac{p(y_{t+1}|x_{t+1}) p(x_{t+1}|x_t)}{p(y_{t+1}|y_{1:t})}
+\end{equation}
+
+$p(x_{0:t}|y_{1:t})$ is call the {\em posterior distribution}. 
+
+\section{Hypothesis}
+
+To show \eqref{recurr}, we need of two hypothesis : 
+\begin{itemize}
+   \item the processus is {\em markovian } or without memory :  
+   \begin{equation}\label{markov} 
+   p(x_{t+1}| x_{0:t}) = p(x_{t+1} |x_t)) \, \forall t 
+   \end{equation} 
+   \item the observation depends only on the current state : 
+   \begin{equation}\label{obs} 
+   p(y_{t+1} | x_{0:t}) = p(y_{t+1} | x_{t+1})
+   \end{equation} 
+\end{itemize}
+
+\section{Bayes's Theorem}
+
+we recall the fondamental theorem 
+$$
+P(A,B) = P(A|B) P(B)
+$$
+and its corollary
+$$
+P(A|B) = P(B|A) \frac{P(A)}{P(B)}
+$$
+\section{Proof}
+
+Now using only Bayes's Theorem and the two hypothesis we can show that \eqref{recurr} is true :
+
+\begin{eqnarray*}
+p(x_{0:t+1}|y_{1:t+1}) = \frac{p(y_{1:t+1}|x_{0:t+1}) p(x_{0:t+1})}{p(y_{1:t+1})} 
+\end{eqnarray*}
+
+we can rewrite the denominator as
+$$
+p(y_{1:t+1}) = p(y_{1:t}, y_{t+1}) = p(y_{t+1} | y_{1:t} ) p(y_{1:t})
+$$
+
+At the numerator, we rewrite the second term as
+\begin{eqnarray*}
+p(x_{0:t+1}) = p(x_{0:t}, x_{t+1}) & = & p(x_{t+1} | x_{0:t} ) p(x_{0:t}) \\
+                                   & = & p(x_{t+1} | x_t) p(x_{0:t}) 
+\end{eqnarray*}
+using the \eqref{markov} property.
+
+the first term also writes as
+\begin{eqnarray*}
+p(y_{1:t+1} | x_{0:t+1}) = \frac{p(y_{1:t}, y_{t+1}, x_{0:t+1})}{p(x_{0:t+1})} & =& \frac{p(y_{t+1} | y_{1:t}, x_{0:t+1})p(y_{1:t},x_{0:t+1})}{p(x_{0:t+1})} \\
+& = & p(y_{t+1} | x_{t+1}) p(y_{1:t} | x_{0:t+1}),
+\end{eqnarray*} 
+using the \eqref{obs} property, since
+$$
+p(y_{t+1} | y_{1:t}, x_{0:t+1}) = p(y_{t+1} | y_{1:t}, x_{0:t}, x_{t+1} ) = p(y_{t+1} | x_{t+1}).
+$$
+
+Finally, injecting the three developpements in the first equation yields to
+$$
+\underbrace{\frac{p(y_{1:t} | x_{0:t+1}) p(x_{0:t})}{p(y_{1:t})}}_{A}\frac{p(x_{t+1}|x_t) p(y_{t+1} | x_{t+1}) }{p(y_{t+1}| y_{1:t})}
+$$
+ 
+Since $y_{t}$ could not depends on futur  
+$$
+p(y_{1:t} | x_{0:t+1}) = p(y_{1:t} | x_{0:t})
+$$
+$A$ could be rewritten as
+$$
+A = \frac{p(y_{1:t} | x_{0:t}) p(x_{0:t})}{p(y_{1:t})} = p(x_{0:t} | y_{1:t})
+$$
+which achieves the demo.
+
+\end{document}
