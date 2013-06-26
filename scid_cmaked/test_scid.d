@@ -16,6 +16,6 @@ auto hilbert(uint n) {
 int main() {
   uint n = 4;
   auto H = hilbert(n);
-  writeln(z);
+  writeln(H);
   return 0;
 }

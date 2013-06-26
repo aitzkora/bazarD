@@ -1,13 +1,20 @@
 cmake_minimum_required(VERSION 2.8)
+# to use CMAKE
+# create a link cmake/Modules pointing to cmaked/cmaked
+
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 project (test_scid D)
 
-include_directories(/home/fux/sources/scid)
+set(SCID_ROOT $ENV{SCID_ROOT})
+if (NOT ${SCID_ROOT})
+  message(FATAL_ERROR "define the variable SCID_ROOT")
+endif()
 
-find_library(LIB_SCID scid 
-       PATHS /home/fux/sources/scid/generated
-             ${PREFIX}/lib/)
+include_directories(${SCID_ROOT})
+
+find_library(LIB_SCID scid PATHS ${SCID_ROOT}/generated ${SCID_ROOT})
+
 if (LIB_SCID)
      message(STATUS "scid library is located at ${LIB_SCID}")
      get_filename_component(SCID_PATH ${LIB_SCID} PATH)
@@ -15,5 +22,5 @@ if (LIB_SCID)
      set(CMAKE_D_FLAGS "${CMAKE_LIBRARY_PATH_FLAG}${SCID_PATH} ${CMAKE_D_FLAGS}")
      target_link_libraries(test_scid scid)
 else()
-    message(FATAL_ERROR "you need from SCID")
+    message(FATAL_ERROR "scid not found!")
 endif()    
