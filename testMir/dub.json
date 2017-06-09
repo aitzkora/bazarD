@@ -1,0 +1,8 @@
+{
+    "name": "debilos",
+    "authors": [ "fux" ],
+    "description": "test the mir library",
+    "copyright": "Copyright © 2017, fux",
+    "license": "GPL",
+    "dependencies": { "mir": "~master" }
+}
